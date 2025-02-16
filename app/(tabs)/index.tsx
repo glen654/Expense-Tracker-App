@@ -1,8 +1,49 @@
-import {Text} from "react-native";
+import {FlatList, Text, TouchableOpacity, View} from "react-native";
+import {useSelector} from "react-redux";
+import {useNavigation} from "expo-router";
+import {Card} from "react-native-paper";
+import {Ionicons} from "@expo/vector-icons";
 
 function index(){
-    return(
-        <Text>Dashboard</Text>
+    const expenses = useSelector((state) => state.expense);
+    const navigation = useNavigation();
+
+    const totalBudget = 1000;
+
+    return (
+        <View style={{ flex: 1, backgroundColor: '#f0f0f0', padding: 16 }}>
+
+            <Card style={{ backgroundColor: 'blue', padding: 16, borderRadius: 8, marginBottom: 16 }}>
+                <Card.Content>
+                    <Text  style={{ color: 'white' }}>Total Budget:</Text>
+                    <Text  style={{ color: 'white', fontWeight: 'bold' }}>${totalBudget}</Text>
+                    <Text  style={{ color: 'white', marginTop: 8 }}>Remaining:</Text>
+                    <Text  style={{ color: 'white', fontWeight: 'bold' }}>remaining</Text>
+                </Card.Content>
+            </Card>
+
+            <FlatList
+                data={expenses}
+                renderItem={({ item }) => (
+                    <Card style={{ marginBottom: 8 }}>
+                        <Card.Content style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Text>{item.category}</Text>
+                            <View>
+                                <Text>{item.amount}</Text>
+                                <Text>{item.date}</Text>
+                            </View>
+                        </Card.Content>
+                    </Card>
+                )}
+                keyExtractor={(item) => item.id}
+            />
+
+            <TouchableOpacity
+                style={{ position: 'absolute', bottom: 24, right: 24, backgroundColor: 'green', borderRadius: 28, padding: 12, elevation: 4 }} // Use style prop
+            >
+                <Ionicons name="add" size={30} color="white" />
+            </TouchableOpacity>
+        </View>
     )
 }
 
