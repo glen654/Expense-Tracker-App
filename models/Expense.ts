@@ -1,7 +1,10 @@
+import {Category} from "./enums/Category";
+
+
 export default interface Expense {
-    id: string;
+    name: string;
     amount: number;
-    category: string;
+    category: Category;
     date: string;
     description?: string;
 }

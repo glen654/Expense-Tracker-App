@@ -1,99 +1,92 @@
-import { useNavigation } from "expo-router";
-import { useDispatch } from "react-redux";
-import React, { useState } from "react";
-import { Platform, View } from "react-native";
-import { addExpense } from "../../reducers/ExpenseReducer";
-import { Text, TextInput, Button } from 'react-native-paper';
-import moment from "moment";
-import DateTimePicker from '@react-native-community/datetimepicker';
-
+import {View, Text, TextInput,Button,StyleSheet} from "react-native";
+import { useDispatch } from 'react-redux';
+import { addExpense } from '../../reducers/ExpenseReducer';
+// import { deductFunds } from '../redux/balanceSlice';
+import {useState} from "react";
 
 function ExpenseForm(){
-    const navigation = useNavigation();
+    const[name,setName]=useState("");
+    const [category,setCategory]=useState("");
+    const [date,setDate]=useState("");
+    const [description, setDescription] = useState('');
+    const [amount, setAmount] = useState('');
     const dispatch = useDispatch();
 
-    const [amount, setAmount] = useState('');
-    const [category, setCategory] = useState('');
-    const [date, setDate] = useState(new Date());
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [description, setDescription] = useState('');
-    const [error, setError] = useState('');
-
-    const handleDateChange = (event: any, selectedDate?: Date) => {
-        if (selectedDate) {
-            setDate(selectedDate);
-        }
-        setShowDatePicker(Platform.OS === 'ios');
-    };
-
-    const handleAddExpense = () => {
-        if (!amount || isNaN(parseFloat(amount)) || !category) {
-            setError('Please enter a valid amount and category.');
-            return;
-        }
-
-        const newExpense = {
-            id: Date.now().toString(),
-            amount: parseFloat(amount),
-            category,
-            date: moment(date).format('YYYY-MM-DD'),
+    const handleSubmit = () => {
+        const expense = {
+            id: Math.random().toString(),
             description,
+            amount: parseFloat(amount),
         };
 
-        dispatch(addExpense(newExpense));
-        navigation.goBack();
+        dispatch(addExpense(expense));
+        // dispatch(deductFunds(expense.amount));
+
+        setDescription('');
+        setAmount('');
     };
-
     return(
-        <View style={{ flex: 1, padding: 16, backgroundColor: '#f0f0f0' }}>
-            <Text style={{ marginBottom: 16, fontSize: 20, fontWeight: 'bold' }}>Add Expense</Text>
-
-            {error ? <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text> : null}
-
+        <View>
+            <Text style={styles.header}>Add Expense</Text>
             <TextInput
-                label="Amount"
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="numeric"
-                style={{ marginBottom: 12 }}
+                placeholder="Name"
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
             />
-
             <TextInput
-                label="Category"
+                placeholder="Category"
+                style={styles.input}
                 value={category}
                 onChangeText={setCategory}
-                style={{ marginBottom: 12 }}
             />
-
-            <Button mode="outlined" onPress={() => setShowDatePicker(true)}>
-                Select Date
-            </Button>
-
-            {showDatePicker && (
-                <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={handleDateChange}
-                />
-            )}
-
-            <Text style={{ marginVertical: 10 }}>{moment(date).format('YYYY-MM-DD')}</Text>
-
             <TextInput
-                label="Description (Optional)"
+                placeholder="Description"
+                style={styles.input}
                 value={description}
                 onChangeText={setDescription}
-                multiline
-                numberOfLines={3}
-                style={{ marginBottom: 12 }}
             />
-
-            <Button mode="contained" onPress={handleAddExpense} style={{ marginTop: 16 }}>
-                Add Expense
-            </Button>
+            <TextInput
+                placeholder="Date"
+                style={styles.input}
+                value={date}
+                onChangeText={setDate}
+            />
+            <TextInput
+                placeholder="Amount"
+                keyboardType="numeric"
+                style={styles.input}
+                value={amount}
+                onChangeText={setAmount}
+            />
+            <Button title="Add Expense" onPress={handleSubmit} />
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    header:{
+        fontSize: 30,
+        fontWeight: 'bold',
+        fontFamily: 'Roboto',
+    },
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#f4f4f4',
+    },
+    title: {
+        fontSize: 24,
+        marginBottom: 20,
+    },
+    input: {
+        height: 50,
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingLeft: 10,
+        borderRadius: 20
+    },
+});
 
 export default ExpenseForm;
