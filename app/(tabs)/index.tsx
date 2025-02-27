@@ -1,24 +1,36 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { addExpense } from '../../reducers/ExpenseReducer';
-import { deductFunds } from '../../reducers/BalanceReducer';
 import { Card, Button } from 'react-native-paper';
+import {getAllExpenses} from "../../reducers/ExpenseReducer";
+import {AppDispatch} from "../../Store/Store";
+import {getWalletAmount} from "../../reducers/WalletReducer";
 
 function index(){
-    const balance = useSelector(state => state.expense);
-    const expenses = useSelector(state => state.balance);
+    const dispatch = useDispatch<AppDispatch>();
+    const expenses = useSelector((state) => state.expense);
+    const wallets = useSelector((state) => state.wallet);
+    const [walletAmount,setWalletAmount] = useState(0);
 
-    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(getAllExpenses());
+        const fetchWalletAmount = async () => {
+            try {
+                const response = await dispatch(getWalletAmount(wallets.name));
+                const data = response.json()
+                setWalletAmount(data.amount);
+            } catch (error) {
+                console.error('Error fetching wallet amount:', error);
+            }
+        };
 
-    const handleAddExpense = (expense) => {
-        dispatch(addExpense(expense));
-        dispatch(deductFunds(expense.amount));
-    };
+        fetchWalletAmount();
+    }, [dispatch,wallets]);
+
     return(
         <View style={styles.container}>
             <Text style={styles.balance}>Balance: Rs.
-                {balance}</Text>
+                {walletAmount}</Text>
             {/*<Button mode="contained" onPress={() => navigation.navigat('Add Expense')}>*/}
             {/*    Add Expense*/}
             {/*</Button>*/}
@@ -27,11 +39,12 @@ function index(){
                 data={expenses}
                 renderItem={({ item }) => (
                     <Card style={styles.card}>
+                        <Text>{item.name}</Text>
                         <Text>{item.description}</Text>
                         <Text>₹{item.amount}</Text>
                     </Card>
                 )}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.id.toString()}
             />
         </View>
     )
@@ -50,6 +63,7 @@ const styles = StyleSheet.create({
     card: {
         marginVertical: 8,
         padding: 16,
+        backgroundColor: '#ffffff',
     },
 });
 

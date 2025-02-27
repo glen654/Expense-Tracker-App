@@ -1,65 +1,71 @@
 import {View, Text, TextInput,Button,StyleSheet} from "react-native";
-import { useDispatch } from 'react-redux';
-import { addExpense } from '../../reducers/ExpenseReducer';
-// import { deductFunds } from '../redux/balanceSlice';
-import {useState} from "react";
+import {useDispatch, useSelector} from 'react-redux';
+import { getAllExpenses, saveExpense} from '../../reducers/ExpenseReducer';
+import {useEffect, useState} from "react";
+import {AppDispatch} from "../../Store/Store";
+import {Category} from "../../models/enums/Category";
 
 function ExpenseForm(){
-    const[name,setName]=useState("");
-    const [category,setCategory]=useState("");
-    const [date,setDate]=useState("");
-    const [description, setDescription] = useState('');
-    const [amount, setAmount] = useState('');
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
+    const expenses = useSelector((state) =>state.expense);
 
-    const handleSubmit = () => {
-        const expense = {
-            id: Math.random().toString(),
-            description,
-            amount: parseFloat(amount),
-        };
+    const initialExpenseState = {
+        name: "",
+        amount: 0,
+        category: "" as Category,
+        date: "",
+        description: "",
+    }
 
-        dispatch(addExpense(expense));
-        // dispatch(deductFunds(expense.amount));
+    const [expense, setExpense] = useState(initialExpenseState);
 
-        setDescription('');
-        setAmount('');
+    const handleAddExpense = () => {
+        if(!expense.name || !expense.amount || !expense.category || !expense.date || !expense.description) {
+            alert("All fields are required");
+            return
+        }
+        const newExpense = {name: expense.name, amount: expense.amount, category: expense.category, date: expense.date, description: expense.description};
+        dispatch(saveExpense(newExpense));
+        dispatch(getAllExpenses());
     };
+    useEffect(() => {
+        dispatch(getAllExpenses());
+    }, [dispatch]);
     return(
         <View>
             <Text style={styles.header}>Add Expense</Text>
             <TextInput
                 placeholder="Name"
                 style={styles.input}
-                value={name}
-                onChangeText={setName}
+                value={expense.name}
+                onChangeText={(text) => setExpense({...expense, name: text})}
+            />
+            <TextInput
+                placeholder="Amount"
+                style={styles.input}
+                value={String(expense.amount)}
+                onChangeText={(text) => setExpense({...expense, amount: parseFloat(text) || 0})}
             />
             <TextInput
                 placeholder="Category"
                 style={styles.input}
-                value={category}
-                onChangeText={setCategory}
-            />
-            <TextInput
-                placeholder="Description"
-                style={styles.input}
-                value={description}
-                onChangeText={setDescription}
+                value={expense.category}
+                onChangeText={(text) => setExpense({...expense, category: text as Category})}
             />
             <TextInput
                 placeholder="Date"
                 style={styles.input}
-                value={date}
-                onChangeText={setDate}
+                value={expense.date}
+                onChangeText={(text) => setExpense({...expense, date: text})}
             />
             <TextInput
                 placeholder="Amount"
                 keyboardType="numeric"
                 style={styles.input}
-                value={amount}
-                onChangeText={setAmount}
+                value={expense.description}
+                onChangeText={(text) => setExpense({...expense, description: text})}
             />
-            <Button title="Add Expense" onPress={handleSubmit} />
+            <Button title="Add Expense" onPress={handleAddExpense} />
         </View>
     )
 }
