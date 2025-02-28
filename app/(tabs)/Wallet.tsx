@@ -1,7 +1,7 @@
 import {Button, FlatList, StyleSheet, Text, TextInput, View} from "react-native";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch} from "../../Store/Store";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {getAllWallets, saveWallet, updateWallet} from "../../reducers/WalletReducer";
 import {IconButton} from "react-native-paper";
 
@@ -56,9 +56,11 @@ function Wallet(){
         </View>
     );
 
+    useEffect(() => {
+        dispatch(getAllWallets());
+    }, [dispatch]);
     return(
         <View>
-            <Text style={styles.header}>Add Wallet</Text>
             <TextInput
                 placeholder="Wallet Name"
                 style={styles.input}
@@ -71,8 +73,11 @@ function Wallet(){
                 value={String(wallet.amount)}
                 onChangeText={(text) => setWallet({...wallet, amount: parseFloat(text) || 0})}
             />
-            <Button title="Add Wallet" onPress={handleAddNewWallet} />
-            <Button title="Update Wallet" onPress={handleUpdateWallet} />
+            <View style={styles.buttonWrapper}>
+                <Button title="Add Wallet" onPress={handleAddNewWallet}/>
+                <Button title="Update Wallet" onPress={handleUpdateWallet} />
+            </View>
+
 
             <FlatList
                 data={wallets}
@@ -102,6 +107,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         paddingLeft: 10,
         borderRadius: 20,
+        width: '90%',
+        marginLeft: 20,
+        marginTop: 20
     },
     walletList: {
         marginTop: 20,
@@ -117,6 +125,8 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
+        width: '90%',
+        marginLeft: 30
     },
     icon: {
         marginRight: 15,
@@ -131,6 +141,14 @@ const styles = StyleSheet.create({
     walletAmount: {
         fontSize: 16,
         color: '#4CAF50',
+    },
+    buttonWrapper: {
+        borderRadius: 10,
+        overflow: 'hidden',
+        width: 200,
+        marginBottom: 20,
+        marginLeft: 20,
+        gap: 10
     },
 });
 

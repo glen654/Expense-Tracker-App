@@ -33,7 +33,6 @@ function ExpenseForm(){
     }, [dispatch]);
     return(
         <View>
-            <Text style={styles.header}>Add Expense</Text>
             <TextInput
                 placeholder="Name"
                 style={styles.input}
@@ -65,7 +64,9 @@ function ExpenseForm(){
                 value={expense.description}
                 onChangeText={(text) => setExpense({...expense, description: text})}
             />
-            <Button title="Add Expense" onPress={handleAddExpense} />
+            <View style={styles.buttonWrapper}>
+                <Button title="Add Expense" onPress={handleAddExpense} />
+            </View>
         </View>
     )
 }
@@ -91,7 +92,18 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 10,
         paddingLeft: 10,
-        borderRadius: 20
+        borderRadius: 20,
+        width: '90%',
+        marginLeft: 20,
+        marginTop: 20
+    },
+    buttonWrapper: {
+        backgroundColor: 'blue',
+        borderRadius: 10,
+        overflow: 'hidden',
+        width: 200,
+        marginBottom: 20,
+        marginLeft: 20
     },
 });
 
